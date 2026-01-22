@@ -8,6 +8,11 @@ Este é um simulador de batalhas RPG desenvolvido em **Python**, utilizando a bi
 - **NPC Aleatório:** Oponente gerado dinamicamente com nomes reais (via biblioteca `Faker`) e combinações aleatórias de classe/arma.
 - **Sistema de Batalha:** Lógica de turnos com cálculos de dano baseados em proficiência e tipos de armas.
 - **Interface Intuitiva:** Exibição de HP em tempo real, métricas de armas e log de combate detalhado.
+- **Analytics e Persistência de Dados:** Além da lógica de combate, implementei um sistema de ETL simplificado usando Pandas:
+1. *Extração:* A cada batalha finalizada, os dados (Vencedor, Perdedor, Turnos) são capturados.
+2. *Carga (Persistence):* Os dados são salvos incrementalmente em um arquivo local (`.csv`), simulando um banco de dados.
+3. *Visualização:* Uso do *Streamlit* para ler o CSV e gerar gráficos de performance em tempo real.
+[Dashboard Preview](Dashboard_preview.png)
 
 ## 🛠️ Tecnologias Utilizadas
 

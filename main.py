@@ -2,10 +2,27 @@ import herois
 import streamlit as st
 from faker import Faker
 import random
+import pandas as pd
+import os
+
+st.markdown("""
+    <style>
+        audio { display: none; }    
+    <style>  """, unsafe_allow_html=True)
+
+def salvar_historico(vencedor, perdedor, turnos):
+    arquivo = 'historico_batalhas.csv'
+    novo_dado = {'Vencedor': [vencedor], 'Perdedor': [perdedor], 'Turnos': [turnos]}
+    df_novo = pd.DataFrame(novo_dado)
+
+    if os.path.exists(arquivo):
+        df_novo.to_csv(arquivo, mode='a', header=False, index=False)
+    else:
+        df_novo.to_csv(arquivo, index=False)
+
+
 
 fake = Faker('pt_BR')
-
-
 
 armas = {'Machado': herois.machado, 
     'Arco': herois.arco,
@@ -76,6 +93,7 @@ if 'player' in st.session_state:
     
     if p.vida > 0 and n.vida > 0:
         if st.button('💥 DAR UM GOLPE'):
+            st.audio('som_dano.mp4', format='audio/mp4', autoplay=True)
             dano_p = p.atacar()
             n.defesa(dano_p)
             st.session_state.log.append(f'{p.nome} atacou! {n.nome} ficou com {n.vida:.1f} HP.')
@@ -88,10 +106,12 @@ if 'player' in st.session_state:
                 st.session_state.log.append(f'🏆{p.nome} venceu a batalha!')
                 st.warning('A batalha acabou! Caso queira brincar denovo clique em ''Começar a Batalha'' ')
                 st.balloons()
+                salvar_historico(p.nome, n.nome, len(st.session_state.log))
             elif p.vida <= 0:
                 st.session_state.log.append(f'🏆{n.nome} venceu a batalha! Sobra nada pro beta!')
                 st.warning('A batalha acabou! Caso queira brincar denovo clique em ''Começar a Batalha'' ')
-                st.balloons() 
+                st.balloons()
+                salvar_historico(n.nome, p.nome, len(st.session_state.log))
 
         st.divider()
         c1, c2 = st.columns(2)
@@ -100,6 +120,14 @@ if 'player' in st.session_state:
 
         for registro in reversed(st.session_state.log):
             st.write(registro)
+
+        st.divider()
+        st.subheader("📊 Histórico do Coliseu")
+        if os.path.exists('historico_batalhas.csv'):
+            df = pd.read_csv('historico_batalhas.csv')
+            st.dataframe(df)
+
+            st.bar_chart(df['Vencedor'].value_counts())
 
 
 

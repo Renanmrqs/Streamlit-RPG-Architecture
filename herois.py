@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 class Personagem(ABC):
     def __init__(self, nome):
         self.nome = nome
+        self.level = 1
         
 
     @abstractmethod
@@ -142,7 +143,4 @@ class Guerreiro(Personagem):
         dano_inimigo = ataque_inimigo
         self.vida -= dano_inimigo
         return self.vida
-
-
-
 
