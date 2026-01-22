@@ -20,6 +20,7 @@ Este é um simulador de batalhas RPG desenvolvido em **Python**, utilizando a bi
 - **Streamlit**: Framework para a criação da interface web.
 - **Faker**: Geração de dados aleatórios para NPCs.
 - **POO Avançada**: Uso de classes abstratas, herança e polimorfismo.
+- **Pandas**: Framework de manipulação e análise de dados.
 
 ## 📦 Como Executar o Projeto
 
@@ -48,5 +49,8 @@ streamlit run main.py
 *Mapeamento Dinâmico: Uso de dicionários para instanciar classes de forma escalável, evitando excesso de estruturas condicionais (if/else).*
 
 *Arquitetura de Software: Separação da lógica de combate (backend) da camada de visualização (frontend).*
+
+*Analytics e Persistencia de Dados: Dashboard interrativo, com persistencia de dados.*
+
 
 Desenvolvido por: Renan - Focado em evoluir e buscar novas oportunidades!
