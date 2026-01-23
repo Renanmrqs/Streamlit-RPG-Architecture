@@ -1,4 +1,6 @@
 # ⚔️ Coliseu de Batalha Dinâmico
+> 📢 **Update (Jan/2026): Módulo de Analytics Adicionado!**
+> Agora o projeto conta com persistência de dados em CSV e Dashboards automáticos com Pandas.
 
 Este é um simulador de batalhas RPG desenvolvido em **Python**, utilizando a biblioteca **Streamlit** para a interface gráfica. O projeto foca na aplicação de conceitos avançados de **Programação Orientada a Objetos (POO)** e gestão de estado em aplicações Web.
 
