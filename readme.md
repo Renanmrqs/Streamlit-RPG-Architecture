@@ -4,7 +4,7 @@
 
 ![Python Version](https://img.shields.io/badge/python-3.11+-blue.svg)
 ![Streamlit](https://img.shields.io/badge/streamlit-1.52.2-FF4B4B.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 ![Status](https://img.shields.io/badge/status-active-success.svg)
 
 **🎮 [DEMO AO VIVO](https://app-rpg-architecturepublic-fv6z8svu4beme5tfdwikkv.streamlit.app/) 🎮**
