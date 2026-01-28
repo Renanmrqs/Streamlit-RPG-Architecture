@@ -23,10 +23,10 @@ class Arma(ABC):
     def __init__(self, nome, dano):
         self.nome = nome
         self.dano = dano
-
-        @abstractmethod
-        def gerar_dano(self):
-            pass
+    
+    @abstractmethod
+    def gerar_dano(self):
+        pass
 
 class ArmaEnvenenada(Arma):
     def __init__(self):
@@ -94,7 +94,6 @@ class Tank(Personagem):
     def atacar(self):
         dano_base = self.arma.gerar_dano()
         if isinstance(self.arma, CajadoMago) or isinstance(self.arma, Arco):
-            print(f'{self.nome} nao tem muita aptidão com {self.arma.nome} e deu pouco dano')
             return dano_base * 0.1
         return dano_base
     
@@ -115,7 +114,6 @@ class Mago(Personagem):
     def atacar(self):
         dano_base = self.arma.gerar_dano()
         if not isinstance(self.arma, CajadoMago):
-            print(f'o {self.nome} nao sabe usar {self.arma.nome} e causou pouco dano')
             return dano_base * 0.5
         return dano_base
     

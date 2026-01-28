@@ -8,7 +8,7 @@ import os
 st.markdown("""
     <style>
         audio { display: none; }    
-    <style>  """, unsafe_allow_html=True)
+    </style>  """, unsafe_allow_html=True)
 
 def salvar_historico(vencedor, perdedor, turnos):
     arquivo = 'historico_batalhas.csv'
@@ -35,13 +35,7 @@ armas_list = list(armas.values())
 classes_list = list(classes.values())
 
 
-classe_npc = random.choice(classes_list)
-arma_npc = random.choice(armas_list)
-
-
-
 st.title('--- Coliseu de Batalha Dinamico---')
-col1, col2 = st.columns(2)
 
 st.subheader('⚔️ Arsenal Disponível')
 col_a, col_b, col_c, col_d = st.columns(4)
@@ -79,7 +73,8 @@ with st.container():
 if st.button("🔥 COMEÇAR A BATALHA"):
     nome_aleatorio = fake.name()
 
-
+    classe_npc = random.choice(classes_list)
+    arma_npc = random.choice(armas_list)
     st.session_state.player = classes[classe_usuario](nome_usuario, armas[arma_usuario])
     st.session_state.npc = classe_npc(nome_aleatorio, arma_npc)
     
@@ -94,13 +89,11 @@ if 'player' in st.session_state:
     if p.vida > 0 and n.vida > 0:
         if st.button('💥 DAR UM GOLPE'):
             st.audio('som_dano.mp4', format='audio/mp4', autoplay=True)
-            dano_p = p.atacar()
-            n.defesa(dano_p)
+            n.defesa(p.atacar())
             st.session_state.log.append(f'{p.nome} atacou! {n.nome} ficou com {n.vida:.1f} HP.')
 
             if n.vida > 0:
-                dano_n = n.atacar()
-                p.defesa(dano_n)
+                p.defesa(n.atacar())
                 st.session_state.log.append(f'{n.nome} contra-atacou! {p.nome} ficou com {p.vida:.1f} HP.')
             if n.vida <= 0:
                 st.session_state.log.append(f'🏆{p.nome} venceu a batalha!')
