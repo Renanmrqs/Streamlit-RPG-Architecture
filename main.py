@@ -70,6 +70,17 @@ with st.container():
     with col3:
         arma_usuario = st.selectbox('Arma do seu Boneco', list(armas.keys()))
 
+if os.path.exists('historico_batalhas.csv'):
+        df = pd.read_csv('historico_batalhas.csv')
+        expander = st.expander("Veja o Histórico de batalhas")
+        expander.dataframe(df)
+        expander.bar_chart(df['Vencedor'].value_counts())
+        
+        
+        
+
+#add historico
+
 if st.button("🔥 COMEÇAR A BATALHA"):
     nome_aleatorio = fake.name()
 
