@@ -10,8 +10,10 @@ st.markdown("""
         audio { display: none; }    
     </style>  """, unsafe_allow_html=True)
 
-def salvar_historico(vencedor, perdedor, turnos):
-    arquivo = 'historico_batalhas.csv'
+### 'BANCO DE DADOS batalha'
+
+def salvar_historico(vencedor, perdedor, turnos, modo='aleatorio'):
+    arquivo = 'historico_coliseu.csv' if modo == 'coliseu' else 'historico_batalhas.csv'
     novo_dado = {'Vencedor': [vencedor], 'Perdedor': [perdedor], 'Turnos': [turnos]}
     df_novo = pd.DataFrame(novo_dado)
 
@@ -20,7 +22,16 @@ def salvar_historico(vencedor, perdedor, turnos):
     else:
         df_novo.to_csv(arquivo, index=False)
 
+def carregar_historico(modo='aleatorio'):
+    arquivo = 'historico_coliseu.csv' if modo == 'coliseu' else 'historico_batalhas.csv'
+    if os.path.exists(arquivo):
+        return pd.read_csv(arquivo)
+    return None
 
+### BANCO DE DADOS COLISEU###
+
+
+## CONFIG ARMAS E CLASSES
 
 fake = Faker('pt_BR')
 
@@ -34,6 +45,7 @@ classes = {'Guerreiro':herois.Guerreiro, 'Tank': herois.Tank, 'Mago': herois.Mag
 armas_list = list(armas.values())
 classes_list = list(classes.values())
 
+### ESTILOS DO SITE ###
 
 st.title('--- Coliseu de Batalha Dinamico---')
 
@@ -57,6 +69,7 @@ with st.expander('Conheça as Classes'):
     
 """)
 
+
 st.title('---Configuração do seu Boneco---')
 
 with st.container():
@@ -64,7 +77,10 @@ with st.container():
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        nome_usuario = st.text_input('Nome do seu Boneco', )
+            nome_usuario = st.text_input('Nome do seu Boneco', )
+            if nome_usuario == '':
+                nome_usuario = fake.name()
+            
     with col2:
         classe_usuario = st.selectbox('Classe do seu Boneco', list(classes.keys()))
     with col3:
@@ -72,51 +88,74 @@ with st.container():
 
 if os.path.exists('historico_batalhas.csv'):
         df = pd.read_csv('historico_batalhas.csv')
-        expander = st.expander("Veja o Histórico de batalhas")
+        expander = st.expander("Veja o Histórico de batalhas da batalha aleatoria")
+        expander.dataframe(df)
+        expander.bar_chart(df['Vencedor'].value_counts())
+
+if os.path.exists('historico_coliseu.csv'):
+        df = pd.read_csv('historico_coliseu.csv')
+        expander = st.expander("Veja o Histórico de batalhas do coliseu")
         expander.dataframe(df)
         expander.bar_chart(df['Vencedor'].value_counts())
         
+
+### BATALHAS ###
+
+
+## config bonecos ##
+
+classe_npc = random.choice(classes_list)
+arma_npc = random.choice(armas_list)
+nome_aleatorio = fake.name()
+## funcoes batalhas
+
+def funcao__start_batalha(classe_usuario=classe_usuario, nome_usuario=nome_usuario, arma_usuario=arma_usuario, classe_npc=classe_npc, nome_npc=nome_aleatorio, arma_npc=arma_npc):
         
-        
+        st.session_state.player = classes[classe_usuario](nome_usuario, armas[arma_usuario])
+        st.session_state.npc = classe_npc(nome_npc, arma_npc)
+        st.session_state.log = []
+        st.success(f'Batalha iniciada: {st.session_state.player.nome} VS {st.session_state.npc.nome}')
 
-#add historico
+def funcao_botao_dano (modo='aleatorio'):
+        p = st.session_state.player
+        n = st.session_state.npc
 
-if st.button("🔥 COMEÇAR A BATALHA"):
-    nome_aleatorio = fake.name()
+        st.audio('som_dano.mp4', format='audio/mp4', autoplay=True)
+        n.defesa(p.atacar())
+        st.session_state.log.append(f'{p.nome} atacou! {n.nome} ficou com {n.vida:.1f} HP.')
 
-    classe_npc = random.choice(classes_list)
-    arma_npc = random.choice(armas_list)
-    st.session_state.player = classes[classe_usuario](nome_usuario, armas[arma_usuario])
-    st.session_state.npc = classe_npc(nome_aleatorio, arma_npc)
-    
-    st.session_state.log = []
-
-    st.success(f'Batalha iniciada: {st.session_state.player.nome} VS {st.session_state.npc.nome}')
-
-if 'player' in st.session_state:
-    p = st.session_state.player
-    n = st.session_state.npc
-    
-    if p.vida > 0 and n.vida > 0:
-        if st.button('💥 DAR UM GOLPE'):
-            st.audio('som_dano.mp4', format='audio/mp4', autoplay=True)
-            n.defesa(p.atacar())
-            st.session_state.log.append(f'{p.nome} atacou! {n.nome} ficou com {n.vida:.1f} HP.')
-
-            if n.vida > 0:
+        if n.vida > 0:
                 p.defesa(n.atacar())
                 st.session_state.log.append(f'{n.nome} contra-atacou! {p.nome} ficou com {p.vida:.1f} HP.')
-            if n.vida <= 0:
-                st.session_state.log.append(f'🏆{p.nome} venceu a batalha!')
-                st.warning('A batalha acabou! Caso queira brincar denovo clique em ''Começar a Batalha'' ')
-                st.balloons()
-                salvar_historico(p.nome, n.nome, len(st.session_state.log))
-            elif p.vida <= 0:
+                        
+        if n.vida <= 0:
+                    st.session_state.log.append(f'🏆{p.nome} venceu a batalha!')
+                    st.warning('A batalha acabou! Caso queira brincar denovo clique em ''Começar a Batalha'' ')
+                    st.balloons()
+                    salvar_historico(p.nome, n.nome, len(st.session_state.log), modo=modo)
+                        
+        elif p.vida <= 0:
                 st.session_state.log.append(f'🏆{n.nome} venceu a batalha! Sobra nada pro beta!')
                 st.warning('A batalha acabou! Caso queira brincar denovo clique em ''Começar a Batalha'' ')
                 st.balloons()
-                salvar_historico(n.nome, p.nome, len(st.session_state.log))
+                salvar_historico(n.nome, p.nome, len(st.session_state.log), modo=modo)
 
+
+
+
+escolhas_batalha = st.radio('ESCOLHA SEU MODO DE JOGO', ['***Batalha Aleatória***', '***Modo Coliseu***'])
+
+
+if st.button("🔥 COMEÇAR A BATALHA") and escolhas_batalha == '***Batalha Aleatória***':
+    funcao__start_batalha() 
+if 'player' in st.session_state:
+    p = st.session_state.player
+    n = st.session_state.npc
+
+    if p.vida > 0 and n.vida > 0:
+        if st.button('💥 DAR UM GOLPE'):
+            funcao_botao_dano(modo='aleatorio')
+        
         st.divider()
         c1, c2 = st.columns(2)
         c1.metric(f'Hp {p.nome}', f'{p.vida:.1f}')
@@ -125,14 +164,38 @@ if 'player' in st.session_state:
         for registro in reversed(st.session_state.log):
             st.write(registro)
 
+
+
+    
+    
+
+### MODO COLISEU ###
+
+## config ##
+
+
+
+if st.button("🏟️ COMEÇAR O COLISEU") and escolhas_batalha == '***Modo Coliseu***':
+    funcao__start_batalha()
+    st.rerun()
+    
+    if 'player' in st.session_state:
+        p = st.session_state.player
+        n = st.session_state.npc
+
+    if p.vida > 0 and n.vida > 0:
+        if st.button('💥 DAR UM GOLPE NO COLISEU'):     
+            funcao_botao_dano(modo='coliseu')
+            st.rerun()
+
+
         st.divider()
-        st.subheader("📊 Histórico do Coliseu")
-        if os.path.exists('historico_batalhas.csv'):
-            df = pd.read_csv('historico_batalhas.csv')
-            st.dataframe(df)
+        c1, c2 = st.columns(2)
+        c1.metric(f'Hp {p.nome}', f'{p.vida:.1f}')
+        c2.metric(f'Hp {n.nome}', f'{n.vida:.1f}')
 
-            st.bar_chart(df['Vencedor'].value_counts())
-
+        for registro in reversed(st.session_state.log):
+            st.write(registro)
 
 
 
